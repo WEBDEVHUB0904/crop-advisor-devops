@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: crop-advisor
+  labels:
+    name: crop-advisor
+    environment: production

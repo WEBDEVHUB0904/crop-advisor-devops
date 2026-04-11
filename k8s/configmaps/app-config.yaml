@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: crop-advisor
+data:
+  DJANGO_SETTINGS_MODULE: "core.settings"
+  DEBUG: "False"
+  DB_ENGINE: "django.db.backends.postgresql"
+  DB_NAME: "postgres"
+  DB_HOST: "aws-1-ap-southeast-1.pooler.supabase.com"
+  DB_PORT: "5432"
+  DB_USER: "postgres.qtabdrszliiqqykdqmek"
+  ALLOWED_HOSTS: "3.237.72.214,13.218.188.91,100.54.43.19,localhost"
+  CORS_ORIGINS: "http://13.218.188.91:30080,http://100.54.43.19:30080"
