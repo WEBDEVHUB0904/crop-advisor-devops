@@ -8,7 +8,7 @@ data:
   DEBUG: "False"
   DB_ENGINE: "django.db.backends.postgresql"
   DB_NAME: "postgres"
-  DB_HOST: "aws-1-ap-southeast-1.pooler.supabase.com"
+  DB_HOST: "13.213.241.248"
   DB_PORT: "5432"
   DB_USER: "postgres.qtabdrszliiqqykdqmek"
   ALLOWED_HOSTS: "3.237.72.214,13.218.188.91,100.54.43.19,localhost"
