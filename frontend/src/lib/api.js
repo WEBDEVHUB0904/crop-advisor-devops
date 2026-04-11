@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").trim();
 
 const ACCESS_TOKEN_KEY = "cropsense_access_token";
 
@@ -16,7 +16,10 @@ export function clearAccessToken() {
 
 export async function apiRequest(path, options = {}) {
   const headers = new Headers(options.headers || {});
-  headers.set("Content-Type", headers.get("Content-Type") || "application/json");
+  headers.set(
+    "Content-Type",
+    headers.get("Content-Type") || "application/json",
+  );
 
   const token = getAccessToken();
   if (token && !headers.has("Authorization")) {
@@ -30,10 +33,13 @@ export async function apiRequest(path, options = {}) {
   });
 
   const contentType = response.headers.get("content-type") || "";
-  const payload = contentType.includes("application/json") ? await response.json() : null;
+  const payload = contentType.includes("application/json")
+    ? await response.json()
+    : null;
 
   if (!response.ok) {
-    const errorMessage = payload?.detail || payload?.error || payload?.message || "Request failed";
+    const errorMessage =
+      payload?.detail || payload?.error || payload?.message || "Request failed";
     throw new Error(errorMessage);
   }
 
