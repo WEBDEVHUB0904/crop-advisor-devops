@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # -------------------------
 # SECURITY
 # -------------------------
-SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = config('DJANGO_SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='', cast=Csv())
 
@@ -37,7 +37,9 @@ LOCAL_APPS = [
     "rest_framework_simplejwt.token_blacklist",
     'django_filters',
     'apps.users',
-    'apps.model'
+    'apps.model',
+    'django_prometheus',
+    'corsheaders',
 
 ]
 
@@ -48,6 +50,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 # MIDDLEWARE
 # -------------------------
 DEFAULT_MIDDLEWARES = [
+    'django_prometheus.middleware.PrometheusBeforeMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -55,6 +58,7 @@ DEFAULT_MIDDLEWARES = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_prometheus.middleware.PrometheusAfterMiddleware', 
 ]
 
 THIRD_PARTY_MIDDLEWARES=[

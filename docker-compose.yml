@@ -1,17 +1,46 @@
 services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: cropdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: localpassword
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   backend:
     build:
       context: ./backend
     env_file:
       - ./backend/.env
     environment:
+      DB_ENGINE: django.db.backends.postgresql
+      DB_HOST: postgres
+      DB_NAME: cropdb
+      DB_USER: postgres
+      DB_PASSWORD: localpassword
+      DB_PORT: "5432"
       ALLOWED_HOSTS: localhost,127.0.0.1,backend
       CSRF_TRUSTED_ORIGINS: http://localhost:3000,http://127.0.0.1:3000
+    depends_on:
+      postgres:
+        condition: service_healthy
     ports:
       - "8000:8000"
     volumes:
       - backend-static:/app/staticfiles
       - backend-media:/app/media
+    networks:
+      default:
+        aliases:
+          - backend-svc
 
   frontend:
     build:
@@ -26,3 +55,4 @@ services:
 volumes:
   backend-static:
   backend-media:
+  postgres_data:
