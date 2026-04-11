@@ -17,9 +17,12 @@ def send_verification_email(self,user_id,base_url):
         VerificationService.send_verification_email(user=user,base_url=base_url)
     except User.DoesNotExist:
          return f"User with id={user_id} does not exist"
+    except ValueError as exc:
+        logger.warning("Skipping verification email for user_id=%s: %s", user_id, exc)
+        return str(exc)
 
-    except Exception as exec:
-        raise self.retry(exec=exec)
+    except Exception as exc:
+        raise self.retry(exc=exc)
 
 @shared_task(bind=True,max_retries=3,default_retry_delay=60)
 def send_verification_password_email(self,user_id,base_url):
@@ -28,8 +31,11 @@ def send_verification_password_email(self,user_id,base_url):
         VerificationService.send_verification_password_email(user=user,base_url=base_url)
     except User.DoesNotExist:
         return f"user with{user_id} doesn't exist"
-    except Exception as exce:
-        raise self.retry(exce=exce)
+    except ValueError as exc:
+        logger.warning("Skipping password-reset email for user_id=%s: %s", user_id, exc)
+        return str(exc)
+    except Exception as exc:
+        raise self.retry(exc=exc)
     
 
 @shared_task
