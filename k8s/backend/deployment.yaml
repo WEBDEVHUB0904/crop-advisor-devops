@@ -25,6 +25,7 @@ spec:
         prometheus.io/port: "8000"
         prometheus.io/path: "/metrics"
     spec:
+      dnsPolicy: Default
       containers:
         - name: backend
           image: sudipkumar09/crop-advisor-devops-backend:latest
