@@ -57,12 +57,18 @@ spec:
             httpGet:
               path: /api/v1/auth/healthz/
               port: 8000
+              httpHeaders:
+                - name: Host
+                  value: localhost
             initialDelaySeconds: 15
             periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /api/v1/auth/healthz/
               port: 8000
+              httpHeaders:
+                - name: Host
+                  value: localhost
             initialDelaySeconds: 30
             periodSeconds: 20
 ---
