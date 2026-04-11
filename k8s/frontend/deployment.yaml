@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: sudipkumar09/crop-advisor-frontend:latest
+        image: sudipkumar09/crop-advisor-devops-frontend:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 80

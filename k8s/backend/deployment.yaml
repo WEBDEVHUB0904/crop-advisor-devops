@@ -27,7 +27,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: sudipkumar09/crop-advisor-backend:latest
+          image: sudipkumar09/crop-advisor-devops-backend:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8000
