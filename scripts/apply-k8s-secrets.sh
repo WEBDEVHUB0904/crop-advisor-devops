@@ -11,7 +11,8 @@ fi
 
 # Normalize CRLF to LF so sourcing works on Linux even if file came from Windows.
 tmp_env_file="$(mktemp)"
-trap 'rm -f "$tmp_env_file"' EXIT
+secret_env_file="$(mktemp)"
+trap 'rm -f "$tmp_env_file" "$secret_env_file"' EXIT
 sed 's/\r$//' "$ENV_FILE" > "$tmp_env_file"
 
 required_vars=(
@@ -41,7 +42,12 @@ for var_name in "${required_vars[@]}"; do
   fi
 done
 
+# Build a filtered env file with only secret keys to avoid overriding ConfigMap settings.
+for var_name in "${required_vars[@]}"; do
+  grep -E "^${var_name}=" "$tmp_env_file" | head -n1 >> "$secret_env_file"
+done
+
 kubectl create secret generic app-secrets \
   --namespace crop-advisor \
-  --from-env-file="$tmp_env_file" \
+  --from-env-file="$secret_env_file" \
   --dry-run=client -o yaml | kubectl apply -f -
