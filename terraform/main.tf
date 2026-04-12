@@ -22,6 +22,21 @@ resource "aws_instance" "k8s_master" {
   }
 }
 
+resource "aws_eip" "k8s_master" {
+  domain = "vpc"
+
+  tags = {
+    Name    = "${var.project_name}-master-eip"
+    Role    = "control-plane"
+    Project = var.project_name
+  }
+}
+
+resource "aws_eip_association" "k8s_master" {
+  allocation_id = aws_eip.k8s_master.id
+  instance_id   = aws_instance.k8s_master.id
+}
+
 resource "aws_instance" "k8s_workers" {
   count                  = var.worker_count
   ami                    = var.ubuntu_ami
@@ -40,4 +55,21 @@ resource "aws_instance" "k8s_workers" {
     Role    = "worker"
     Project = var.project_name
   }
+}
+
+resource "aws_eip" "k8s_workers" {
+  count  = var.worker_count
+  domain = "vpc"
+
+  tags = {
+    Name    = "${var.project_name}-worker-${count.index + 1}-eip"
+    Role    = "worker"
+    Project = var.project_name
+  }
+}
+
+resource "aws_eip_association" "k8s_workers" {
+  count         = var.worker_count
+  allocation_id = aws_eip.k8s_workers[count.index].id
+  instance_id   = aws_instance.k8s_workers[count.index].id
 }

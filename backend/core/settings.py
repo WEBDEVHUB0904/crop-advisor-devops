@@ -116,6 +116,13 @@ if DB_ENGINE != 'django.db.backends.sqlite3':
         'PORT': config('DB_PORT', default='5432'),
     })
 
+    db_sslmode = config('DB_SSLMODE', default='disable')
+    db_connect_timeout = config('DB_CONNECT_TIMEOUT', default=10, cast=int)
+    DATABASES['default']['OPTIONS'] = {
+        'sslmode': db_sslmode,
+        'connect_timeout': db_connect_timeout,
+    }
+
 # -------------------------
 # PASSWORDS
 # -------------------------

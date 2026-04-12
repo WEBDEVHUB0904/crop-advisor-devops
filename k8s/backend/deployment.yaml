@@ -35,42 +35,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: app-config
-          env:
-            - name: DJANGO_SECRET_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: app-secrets
-                  key: django-secret-key
-            - name: DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: app-secrets
-                  key: db-password
-            - name: BREVO_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: app-secrets
-                  key: brevo-api-key
-            - name: BREVO_SENDER_EMAIL
-              valueFrom:
-                secretKeyRef:
-                  name: app-secrets
-                  key: brevo-sender-email
-            - name: BREVO_SENDER_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: app-secrets
-                  key: brevo-sender-name
-            - name: CELERY_BROKER_URL
-              valueFrom:
-                secretKeyRef:
-                  name: app-secrets
-                  key: celery-broker-url
-            - name: CELERY_RESULT_BACKEND
-              valueFrom:
-                secretKeyRef:
-                  name: app-secrets
-                  key: celery-result-backend
+            - secretRef:
+                name: app-secrets
           resources:
             requests:
               cpu: "200m"

@@ -1,6 +1,6 @@
 output "master_public_ip" {
-  description = "Master node public IP — use this in GitHub Secrets as K8S_MASTER_IP"
-  value       = aws_instance.k8s_master.public_ip
+  description = "Master node Elastic IP — use this in GitHub Secrets as K8S_MASTER_IP"
+  value       = aws_eip.k8s_master.public_ip
 }
 
 output "master_private_ip" {
@@ -9,8 +9,8 @@ output "master_private_ip" {
 }
 
 output "worker_public_ips" {
-  description = "Worker nodes public IPs"
-  value       = aws_instance.k8s_workers[*].public_ip
+  description = "Worker nodes Elastic IPs"
+  value       = aws_eip.k8s_workers[*].public_ip
 }
 
 output "worker_private_ips" {
@@ -20,13 +20,13 @@ output "worker_private_ips" {
 
 output "ssh_master_command" {
   description = "SSH command for master"
-  value       = "ssh -i ~/.ssh/k8s-key ubuntu@${aws_instance.k8s_master.public_ip}"
+  value       = "ssh -i ~/.ssh/k8s-key ubuntu@${aws_eip.k8s_master.public_ip}"
 }
 
 output "ssh_worker_commands" {
   description = "SSH commands for workers"
   value = [
-    for w in aws_instance.k8s_workers :
+    for w in aws_eip.k8s_workers :
     "ssh -i ~/.ssh/k8s-key ubuntu@${w.public_ip}"
   ]
 }
