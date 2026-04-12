@@ -2,15 +2,17 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ENV_FILE="$ROOT_DIR/backend/.env"
 
-if [ ! -f "$ROOT_DIR/backend/.env" ]; then
+if [ ! -f "$ENV_FILE" ]; then
   echo "backend/.env not found" >&2
   exit 1
 fi
 
-set -a
-source "$ROOT_DIR/backend/.env"
-set +a
+# Normalize CRLF to LF so sourcing works on Linux even if file came from Windows.
+tmp_env_file="$(mktemp)"
+trap 'rm -f "$tmp_env_file"' EXIT
+sed 's/\r$//' "$ENV_FILE" > "$tmp_env_file"
 
 required_vars=(
   BREVO_API_KEY
@@ -26,7 +28,14 @@ required_vars=(
 )
 
 for var_name in "${required_vars[@]}"; do
-  if [ -z "${!var_name:-}" ]; then
+  # Match KEY=... lines and require non-empty value after '='.
+  if ! grep -qE "^${var_name}=" "$tmp_env_file"; then
+    echo "Missing required variable: ${var_name}" >&2
+    exit 1
+  fi
+
+  var_value="$(grep -E "^${var_name}=" "$tmp_env_file" | head -n1 | cut -d'=' -f2-)"
+  if [ -z "$var_value" ]; then
     echo "Missing required variable: ${var_name}" >&2
     exit 1
   fi
@@ -34,14 +43,5 @@ done
 
 kubectl create secret generic app-secrets \
   --namespace crop-advisor \
-  --from-literal=BREVO_API_KEY="$BREVO_API_KEY" \
-  --from-literal=BREVO_SENDER_EMAIL="$BREVO_SENDER_EMAIL" \
-  --from-literal=BREVO_SENDER_NAME="$BREVO_SENDER_NAME" \
-  --from-literal=CELERY_BROKER_URL="$CELERY_BROKER_URL" \
-  --from-literal=CELERY_RESULT_BACKEND="$CELERY_RESULT_BACKEND" \
-  --from-literal=DB_PASSWORD="$DB_PASSWORD" \
-  --from-literal=DJANGO_SECRET_KEY="$DJANGO_SECRET_KEY" \
-  --from-literal=DJANGO_SUPERUSER_EMAIL="$DJANGO_SUPERUSER_EMAIL" \
-  --from-literal=DJANGO_SUPERUSER_PASSWORD="$DJANGO_SUPERUSER_PASSWORD" \
-  --from-literal=GEMINI_API_KEY="$GEMINI_API_KEY" \
+  --from-env-file="$tmp_env_file" \
   --dry-run=client -o yaml | kubectl apply -f -
