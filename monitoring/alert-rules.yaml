@@ -1,37 +1,37 @@
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-	name: crop-advisor-alerts
-	namespace: monitoring
-	labels:
-		release: monitoring
+  name: crop-advisor-alerts
+  namespace: monitoring
+  labels:
+    release: monitoring
 spec:
-	groups:
-		- name: crop-advisor.rules
-			rules:
-				- alert: BackendHighCPU
-					expr: |
-						rate(container_cpu_usage_seconds_total{
-							namespace="crop-advisor",
-							container="backend"
-						}[5m]) * 100 > 70
-					for: 2m
-					labels:
-						severity: warning
-					annotations:
-						summary: "Backend CPU high - HPA may scale up"
-						description: "Backend CPU is above 70% for 2 minutes. Current value: {{ $value }}%"
+  groups:
+    - name: crop-advisor.rules
+      rules:
+        - alert: BackendHighCPU
+          expr: |
+            rate(container_cpu_usage_seconds_total{
+              namespace="crop-advisor",
+              container="backend"
+            }[5m]) * 100 > 70
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Backend CPU high - HPA may scale up"
+            description: "Backend CPU is above 70% for 2 minutes. Current value: {{ $value }}%"
 
-				- alert: PodScaleEvent
-					expr: |
-						kube_horizontalpodautoscaler_status_current_replicas{
-							namespace="crop-advisor"
-						} != kube_horizontalpodautoscaler_status_desired_replicas{
-							namespace="crop-advisor"
-						}
-					for: 0m
-					labels:
-						severity: info
-					annotations:
-						summary: "HPA scaling event detected in crop-advisor"
-						description: "Current replicas differ from desired replicas for an HPA target."
+        - alert: PodScaleEvent
+          expr: |
+            kube_horizontalpodautoscaler_status_current_replicas{
+              namespace="crop-advisor"
+            } != kube_horizontalpodautoscaler_status_desired_replicas{
+              namespace="crop-advisor"
+            }
+          for: 0m
+          labels:
+            severity: info
+          annotations:
+            summary: "HPA scaling event detected in crop-advisor"
+            description: "Current replicas differ from desired replicas for an HPA target."
