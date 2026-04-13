@@ -59,6 +59,20 @@ resource "aws_security_group" "k8s_master_sg" {
     protocol    = "udp"
     self        = true
   }
+  ingress {
+    description = "Calico IP-in-IP between master nodes"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "4"
+    self        = true
+  }
+  ingress {
+    description = "All node traffic within master SG"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    self        = true
+  }
   egress {
     from_port   = 0
     to_port     = 0
@@ -81,10 +95,10 @@ resource "aws_security_group" "k8s_worker_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   ingress {
-    description = "Kubelet API from master"
-    from_port   = 10250
-    to_port     = 10250
-    protocol    = "tcp"
+    description     = "Kubelet API from master"
+    from_port       = 10250
+    to_port         = 10250
+    protocol        = "tcp"
     security_groups = [aws_security_group.k8s_master_sg.id]
   }
   ingress {
@@ -116,10 +130,17 @@ resource "aws_security_group" "k8s_worker_sg" {
     self        = true
   }
   ingress {
-    description = "All traffic from master"
+    description = "All node traffic within worker SG"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
+    self        = true
+  }
+  ingress {
+    description     = "All traffic from master"
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
     security_groups = [aws_security_group.k8s_master_sg.id]
   }
   egress {
