@@ -151,3 +151,13 @@ resource "aws_security_group" "k8s_worker_sg" {
   }
   tags = { Name = "${var.project_name}-worker-sg" }
 }
+
+resource "aws_security_group_rule" "master_kubelet_from_workers" {
+  type                     = "ingress"
+  description              = "Kubelet API from workers (metrics-server scrape)"
+  from_port                = 10250
+  to_port                  = 10250
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.k8s_master_sg.id
+  source_security_group_id = aws_security_group.k8s_worker_sg.id
+}
