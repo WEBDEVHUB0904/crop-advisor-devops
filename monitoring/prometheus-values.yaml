@@ -1,5 +1,11 @@
 grafana:
   adminPassword: "CropAdvisor@123"
+  persistence:
+    enabled: true
+    type: pvc
+    size: 10Gi
+    accessModes:
+      - ReadWriteOnce
   service:
     type: NodePort
     nodePort: 30300
